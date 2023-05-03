@@ -1,6 +1,12 @@
 class SignupsController < ApplicationController
   def update
-    data = NbPeople::Update.call(signup_params[:nb_id], { tags: signup_params[:tag] })
+    random_string = ('a'..'z').to_a.shuffle[0,8].join
+    attributes = {
+      tags: signup_params[:tag],
+      church: random_string # update a core person field to trigger a webhook 
+    }
+    data = NbPeople::Update.call(signup_params[:nb_id], attributes)
+
     if data['id'].blank?
       redirect_to root_path, alert: "Please enter a valid signup ID and try again"
     else
