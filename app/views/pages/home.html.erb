@@ -1,0 +1,82 @@
+<div class="container py-5">
+  <h1 class="pb-2">Missing tag data in NationBuilder webhooks</h1>
+
+  <div class="pb-3">
+    <p>The table below demonstrates the bug where the tags included in NationBuilder's person_changed and person_created webhook payloads are often out-of-date (i.e. some tags are missing)</p>
+
+    <p id="show_form">
+      <a href="#">Show form to trigger new webhook</a>
+    </p>
+
+    <div id="update_person_tags_form" class="p-3 bg-light mb-3" style="display: none;">
+      <%= form_with(model: nil, url: signup_path, scope: :signup, local: true) do |form| %>
+        <div class="form-group">
+          <%= form.label :nb_id, "NationBuilder Signup ID", class: "mb-0" %>
+          <p class="small text-muted mt-1 mb-2">
+            Please enter a valid signup ID for the "<%= Rails.application.credentials.nation_slug %>" nation
+          </p>
+          <%= form.number_field :nb_id, autofocus: false, class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+          <%= form.label :tag, class: "mb-0" %>
+          <p class="small text-muted mt-1 mb-2">
+            This will be added to the specified profile in NationBuilder
+          </p>
+          <%= form.text_field :tag, autofocus: true, class: "form-control" %>
+        </div>
+
+        <div class="py-2">
+          <%= form.button "Update profile", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+
+    <p>
+      <strong>Webhooks received:</strong>
+      <%= PersonWebhook.count %>
+      <br>
+      <strong>Webhooks with missing tag data:</strong>
+      <%= @webhooks.size %>      
+    </p>
+  </div>
+
+  <% if @webhooks.any? %>
+
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <th></th>
+          <th>Missing tags</th>
+          <th>Webhook tags</th>
+          <th>Actual tags (from API)</th>
+        </thead>
+        <tbody>
+          <% @webhooks.each do |webhook| %>
+          <tr data-webhook-id="<%= webhook.id %>">
+            <td>
+              <p>
+                <strong>NB Signup ID</strong>:
+                <%= webhook.nb_signup_id %>
+              </p>
+              <p>
+                <strong>Webhook created at</strong>:
+                <br>
+                <%= webhook.created_at_formatted %>
+              </p>
+            </td>
+            <td><%= generate_pretty_list(webhook.missing_tags) %></td>
+            <td><%= generate_pretty_list(webhook.tags) %></td>
+            <td><%= generate_pretty_list(webhook.actual_latest_tags) %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+  <% else %>
+
+    <p><strong>There are not yet any webhook records to display.</strong> Please use the form above to update a profile in your nation and trigger a new webhook.</p>
+
+  <% end %>
+</div>

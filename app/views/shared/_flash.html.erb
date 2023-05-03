@@ -1,0 +1,10 @@
+<% unless flash.empty? %>
+  <div id="flash" class="pb-2">
+    <% flash.each do |key, value| %>
+      <% if value.is_a?(String) %>
+        <% bt = button_tag("x", type: "button", class: "close", "data-dismiss" => "alert") %>
+        <%= content_tag(:div, bt + raw(value), class: "alert #{alert_class(key)}") %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

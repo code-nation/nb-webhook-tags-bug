@@ -61,3 +61,4 @@ group :development do
   # gem "spring"
 end
 
+gem "nationbuilder-rb", "~> 1.6", require: 'nationbuilder'
